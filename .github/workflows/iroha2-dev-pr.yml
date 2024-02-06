@@ -62,7 +62,7 @@ jobs:
         run: cargo clippy --workspace --benches --tests --examples --no-default-features --quiet
       - name: Lints with all features enabled
         if: always()
-        run: cargo clippy --workspace --benches --tests --examples --all-features --quiet --message-format=json &> clippy.json
+        run: cargo clippy --workspace --benches --tests --examples --all-features --quiet --message-format=json
       - name: Documentation
         if: always()
         run: cargo doc --no-deps --quiet
@@ -77,7 +77,7 @@ jobs:
           # https://github.com/taiki-e/cargo-llvm-cov#merge-coverages-generated-under-different-test-conditions
           mold --run cargo llvm-cov --doctests --no-run --all-features --workspace --lcov --output-path lcov.info
       - name: Setup sonarqube
-        uses: warchant/setup-sonar-scanner@v8
+        uses: warchant/setup-sonar-scanner@v7
       - name: Run cargo-tarpaulin
         shell: bash
         run: sonar-scanner -Dcommunity.rust.clippy.reportPaths=clippy.json -Dcommunity.rust.lcov.reportPaths=lcov.info -Dsonar.host.url=${{ secrets.SONAR_URL }} -Dsonar.login=${{ secrets.SONAR_TOKEN }}
