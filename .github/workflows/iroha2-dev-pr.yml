@@ -62,7 +62,7 @@ jobs:
         run: cargo clippy --workspace --benches --tests --examples --no-default-features --quiet
       - name: Lints with all features enabled
         if: always()
-        run: cargo clippy --workspace --benches --tests --examples --all-features --quiet --message-format=json &> clippy.josn
+        run: cargo clippy --workspace --benches --tests --examples --all-features --quiet --message-format=json &> clippy.json
       - name: Documentation
         if: always()
         run: cargo doc --no-deps --quiet
