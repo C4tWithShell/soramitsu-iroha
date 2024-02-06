@@ -45,7 +45,7 @@ jobs:
   #       run: ./scripts/tests/consistency.sh docker-compose
 
   sonar_job:
-    runs-on: ubuntu-latest #[self-hosted, Linux, iroha2ci]
+    runs-on: self-hosted #[self-hosted, Linux, iroha2ci]
     container:
       image: hyperledger/iroha2-ci:nightly-2024-01-12
     steps:
