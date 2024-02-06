@@ -76,11 +76,18 @@ jobs:
           # generate report without tests
           # https://github.com/taiki-e/cargo-llvm-cov#merge-coverages-generated-under-different-test-conditions
           mold --run cargo llvm-cov --doctests --no-run --all-features --workspace --lcov --output-path lcov.info
-      - name: Setup Sonarqube
-        uses: warchant/setup-sonar-scanner@v3
-      - name: Sonarqube uploading
-        shell: bash
-        run: sonar-scanner -Dcommunity.rust.clippy.reportPaths=clippy.json -Dcommunity.rust.lcov.reportPaths=lcov.info -Dsonar.host.url=${{ secrets.SONAR_URL }} -Dsonar.login=${{ secrets.SONAR_TOKEN }}
+      - name: SonarQube Scan
+        uses: sonarsource/sonarqube-scan-action@master
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+          SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
+        with:
+          args: >
+            -Dcommunity.rust.clippy.reportPaths=clippy.json
+            -Dcommunity.rust.lcov.reportPaths=lcov.info
+      # - name: Sonarqube uploading
+      #   shell: bash
+      #   run: sonar-scanner -Dcommunity.rust.clippy.reportPaths=clippy.json -Dcommunity.rust.lcov.reportPaths=lcov.info -Dsonar.host.url=${{ secrets.SONAR_URL }} -Dsonar.login=${{ secrets.SONAR_TOKEN }}
       # - name: Upload coverage to coveralls.io
       #   uses: coverallsapp/github-action@v2
       #   with:
