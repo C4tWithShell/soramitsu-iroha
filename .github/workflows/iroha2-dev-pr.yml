@@ -68,18 +68,14 @@ jobs:
         run: cargo doc --no-deps --quiet
       - name: Run tests, with coverage
         run: |
-          cargo install grcov
-          export CARGO_INCREMENTAL=0
-          export RUSTFLAGS="-Zprofile -Ccodegen-units=1 -Copt-level=0 -Clink-dead-code -Coverflow-checks=off -Zno-landing-pads"
           mold --run cargo llvm-cov clean --workspace
           mold --run cargo llvm-cov --doc --no-report --all-features --workspace --no-fail-fast
           mold --run cargo llvm-cov --no-report --ignore-filename-regex main.rs --all-features --workspace --no-fail-fast
-          grcov ./target/debug/ -s . -t lcov --llvm --branch --ignore-not-existing -o lcov.info
-      # - name: Generate lcov report
-      #   run: |
-      #     # generate report without tests
-      #     # https://github.com/taiki-e/cargo-llvm-cov#merge-coverages-generated-under-different-test-conditions
-      #     mold --run cargo llvm-cov --doctests --no-run --all-features --workspace --lcov --output-path lcov.info
+      - name: Generate lcov report
+        run: |
+          # generate report without tests
+          # https://github.com/taiki-e/cargo-llvm-cov#merge-coverages-generated-under-different-test-conditions
+          mold --run cargo llvm-cov --doctests --no-run --all-features --workspace --lcov --output-path lcov.info
       - name: SonarQube Scan
         uses: sonarsource/sonarqube-scan-action@master
         env:
@@ -87,8 +83,8 @@ jobs:
           SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
         with:
           args: >
-            -Dcommunity.rust.clippy.reportPaths=clippy.json
-            -Dcommunity.rust.lcov.reportPaths=lcov.info
+            -Dsonar.community.rust.clippy.reportPaths=clippy.json
+            -Dsonar.community.rust.lcov.reportPaths=lcov.info
       # - name: Sonarqube uploading
       #   shell: bash
       #   run: sonar-scanner -Dcommunity.rust.clippy.reportPaths=clippy.json -Dcommunity.rust.lcov.reportPaths=lcov.info -Dsonar.host.url=${{ secrets.SONAR_URL }} -Dsonar.login=${{ secrets.SONAR_TOKEN }}
