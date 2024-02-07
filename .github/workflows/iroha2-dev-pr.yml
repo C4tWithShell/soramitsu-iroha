@@ -71,8 +71,10 @@ jobs:
           cargo install grcov
           export CARGO_INCREMENTAL=0
           export RUSTFLAGS="-Zprofile -Ccodegen-units=1 -Copt-level=0 -Clink-dead-code -Coverflow-checks=off -Zno-landing-pads"
-          cargo +nightly test
-          grcov . -s . --binary-path ./iroha/target/x86_64-unknown-linux-musl/deploy -t lcov --branch --ignore-not-existing -o ./iroha/target/x86_64-unknown-linux-musl/coverage/
+          mold --run cargo llvm-cov clean --workspace
+          mold --run cargo llvm-cov --doc --no-report --all-features --workspace --no-fail-fast
+          mold --run cargo llvm-cov --no-report --ignore-filename-regex main.rs --all-features --workspace --no-fail-fast
+          grcov ./target/debug/ -s . -t lcov --llvm --branch --ignore-not-existing -o lcov.info
       # - name: Generate lcov report
       #   run: |
       #     # generate report without tests
