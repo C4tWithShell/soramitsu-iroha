@@ -66,16 +66,23 @@ jobs:
       - name: Documentation
         if: always()
         run: cargo doc --no-deps --quiet
-      - name: Run tests, with coverage
+      # - name: Run tests, with coverage
+      #   run: |
+      #     mold --run cargo llvm-cov clean --workspace
+      #     mold --run cargo llvm-cov --doc --no-report --all-features --workspace --no-fail-fast
+      #     mold --run cargo llvm-cov --no-report --ignore-filename-regex main.rs --all-features --workspace --no-fail-fast
+      # - name: Generate lcov report
+      #   run: |
+      #     # generate report without tests
+      #     # https://github.com/taiki-e/cargo-llvm-cov#merge-coverages-generated-under-different-test-conditions
+      #     mold --run cargo llvm-cov report --lcov
+      - name: Coverage
         run: |
-          mold --run cargo llvm-cov clean --workspace
-          mold --run cargo llvm-cov --doc --no-report --all-features --workspace --no-fail-fast
-          mold --run cargo llvm-cov --no-report --ignore-filename-regex main.rs --all-features --workspace --no-fail-fast
-      - name: Generate lcov report
-        run: |
-          # generate report without tests
-          # https://github.com/taiki-e/cargo-llvm-cov#merge-coverages-generated-under-different-test-conditions
-          mold --run cargo llvm-cov report --lcov
+          rustup component add llvm-tools-preview
+          export RUSTFLAGS="-Cinstrument-coverage"
+          export LLVM_PROFILE_FILE="iroha2-%p-%m.profraw"
+          mold --run cargo test --no-default-features
+          grcov . --binary-path ./target/debug -s . -t lcov --branch -o lcov.info --ignore-not-existing
       - name: SonarQube Scan
         uses: sonarsource/sonarqube-scan-action@master
         env:
