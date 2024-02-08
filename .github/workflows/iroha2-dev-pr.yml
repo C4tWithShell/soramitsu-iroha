@@ -1,3 +1,4 @@
+
 name: I2::Dev::Tests
 
 on:
@@ -66,23 +67,16 @@ jobs:
       - name: Documentation
         if: always()
         run: cargo doc --no-deps --quiet
-      # - name: Run tests, with coverage
-      #   run: |
-      #     mold --run cargo llvm-cov clean --workspace
-      #     mold --run cargo llvm-cov --doc --no-report --all-features --workspace --no-fail-fast
-      #     mold --run cargo llvm-cov --no-report --ignore-filename-regex main.rs --all-features --workspace --no-fail-fast
-      # - name: Generate lcov report
-      #   run: |
-      #     # generate report without tests
-      #     # https://github.com/taiki-e/cargo-llvm-cov#merge-coverages-generated-under-different-test-conditions
-      #     mold --run cargo llvm-cov report --lcov
-      - name: Coverage
+      - name: Run tests, with coverage
         run: |
-          rustup component add llvm-tools-preview
-          export RUSTFLAGS="-Cinstrument-coverage"
-          cargo build --verbose
-          export LLVM_PROFILE_FILE="iroha2-%p-%m.profraw" cargo test --verbose
-          grcov . --binary-path ./target/debug -s . -t lcov --branch -o lcov.info --ignore-not-existing
+          mold --run cargo llvm-cov clean --workspace
+          mold --run cargo llvm-cov --doc --no-report --all-features --workspace --no-fail-fast
+          mold --run cargo llvm-cov --no-report --ignore-filename-regex main.rs --all-features --workspace --no-fail-fast
+      - name: Generate lcov report
+        run: |
+          # generate report without tests
+          # https://github.com/taiki-e/cargo-llvm-cov#merge-coverages-generated-under-different-test-conditions
+          mold --run cargo llvm-cov report --lcov
       - name: SonarQube Scan
         uses: sonarsource/sonarqube-scan-action@master
         env:
@@ -90,8 +84,8 @@ jobs:
           SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
         with:
           args: >
-            -Dsonar.community.rust.clippy.reportPaths=clippy.json
-            -Dsonar.community.rust.lcov.reportPaths=lcov.info
+            -Dcommunity.rust.clippy.reportPaths=clippy.json
+            -Dcommunity.rust.lcov.reportPaths=lcov.info
       # - name: Sonarqube uploading
       #   shell: bash
       #   run: sonar-scanner -Dcommunity.rust.clippy.reportPaths=clippy.json -Dcommunity.rust.lcov.reportPaths=lcov.info -Dsonar.host.url=${{ secrets.SONAR_URL }} -Dsonar.login=${{ secrets.SONAR_TOKEN }}
