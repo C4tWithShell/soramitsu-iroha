@@ -81,9 +81,11 @@ jobs:
       #     mold --run cargo llvm-cov --doc --no-report --all-features --workspace --no-fail-fast
       #     mold --run cargo llvm-cov --no-report --ignore-filename-regex main.rs --all-features --workspace --no-fail-fast
       - name: Generate lcov report
+        if: always()
         run: |
           grcov . --binary-path ./target/debug/ -s . -t lcov --branch --ignore-not-existing --ignore "/*" -o lcov.info
       - name: SonarQube Scan
+        if: always()
         uses: sonarsource/sonarqube-scan-action@master
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
