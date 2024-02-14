@@ -19,7 +19,6 @@ concurrency:
 env:
   CARGO_TERM_COLOR: always
   CLIENT_CLI_DIR: "/__w/${{ github.event.repository.name }}/${{ github.event.repository.name }}/test"
-  RUSTUP_TOOLCHAIN: nightly-2024-01-12
 
 jobs:
   # consistency:
@@ -69,21 +68,21 @@ jobs:
         run: cargo doc --no-deps --quiet
       - name: grcov
         run: |
-          export RUSTFLAGS="-Cinstrument-coverage"
-          export LLVM_PROFILE_FILE="soramitsu-iroha-%p-%m.profraw"
-          cargo build
-          cargo test
-          grcov . -s . --binary-path ./iroha/target/x86_64-unknown-linux-musl/deploy -t lcov --branch --ignore-not-existing -o ./lcov.info
+          cargo install grcov
+          mold --run cargo +nightly-2024-01-12 test \
+          --quiet --workspace --no-fail-fast -- \
+          --skip unstable_network --skip ui --test-threads 3
+        env:
+          RUSTFLAGS: "-C instrument-coverage"
+          LLVM_PROFILE_FILE: "iroha-%p-%m.profraw"
       # - name: Run tests, with coverage
       #   run: |
       #     mold --run cargo llvm-cov clean --workspace
       #     mold --run cargo llvm-cov --doc --no-report --all-features --workspace --no-fail-fast
       #     mold --run cargo llvm-cov --no-report --ignore-filename-regex main.rs --all-features --workspace --no-fail-fast
-      # - name: Generate lcov report
-      #   run: |
-      #     # generate report without tests
-      #     # https://github.com/taiki-e/cargo-llvm-cov#merge-coverages-generated-under-different-test-conditions
-      #     mold --run cargo llvm-cov report --lcov --output-path lcov.info
+      - name: Generate lcov report
+        run: |
+          grcov . --binary-path ./target/debug/ -s . -t lcov --branch --ignore-not-existing --ignore "/*" -o lcov.info
       - name: SonarQube Scan
         uses: sonarsource/sonarqube-scan-action@master
         env:
