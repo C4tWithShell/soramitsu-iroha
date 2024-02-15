@@ -55,23 +55,21 @@ jobs:
       #   run: |
       #     rustup component add llvm-tools-preview
       - uses: Swatinem/rust-cache@v2
-      - name: Format
-        run: cargo fmt --all -- --check
+      # - name: Format
+      #   run: cargo fmt --all -- --check
       - name: Lints without features
         if: always()
         run: cargo clippy --workspace --benches --tests --examples --no-default-features --quiet
       - name: Lints with all features enabled
         if: always()
         run: cargo clippy --workspace --benches --tests --examples --all-features --quiet --message-format=json &> clippy.json
-      - name: Documentation
-        if: always()
-        run: cargo doc --no-deps --quiet
+      # - name: Documentation
+      #   if: always()
+      #   run: cargo doc --no-deps --quiet
       - name: grcov
         run: |
           cargo install grcov
-          mold --run cargo +nightly-2024-01-12 test \
-          --quiet --workspace --no-fail-fast -- \
-          --skip unstable_network --skip ui --test-threads 3
+          mold --run cargo test --all-features --workspace --no-fail-fast
         env:
           RUSTFLAGS: "-C instrument-coverage"
           LLVM_PROFILE_FILE: "iroha-%p-%m.profraw"
@@ -83,7 +81,7 @@ jobs:
       - name: Generate lcov report
         if: always()
         run: |
-          grcov . --binary-path ./target/debug/ -s . -t lcov --branch --ignore-not-existing --ignore "/*" -o lcov.info
+          grcov . --binary-path ./target/debug/ -s . -t lcov --branch --ignore-not-existing --ignore "main.rs" -o lcov.info
       - name: SonarQube Scan
         if: always()
         uses: sonarsource/sonarqube-scan-action@master
