@@ -45,7 +45,7 @@ jobs:
   #       run: ./scripts/tests/consistency.sh docker-compose
 
   sonar_job:
-    runs-on: self-hosted #[self-hosted, Linux, iroha2ci]
+    runs-on: ubuntu-latest #[self-hosted, Linux, iroha2ci]
     container:
       image: hyperledger/iroha2-ci:nightly-2024-01-12
     steps:
@@ -92,6 +92,23 @@ jobs:
           args: >
             -Dcommunity.rust.clippy.reportPaths=clippy.json
             -Dcommunity.rust.lcov.reportPaths=lcov.info
+      - name: DefectDojo
+        id: defectdojo
+        uses: C4tWithShell/defectdojo-action@1.0.0
+        with:
+          token: ${{ secrets.DEFECTOJO_TOKEN }}
+          defectdojo_url: ${{ secrets.DEFECTOJO_URL }}
+          product_type: iroha2
+          engagement: ${{ github.ref_name }}
+          tools: ("Trivy Scan" "Github Vulnerability Scan")
+          sonar_projectKey: bastos525:soramitsu-iroha
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          github_repository: ${{ github.repository }}
+          reports: '{"Github Vulnerability Scan": "github.json"}'
+      - name: Show response
+        run: |
+          set -e
+          printf '%s\n' '${{ steps.defectdojo.outputs.response }}'
       # - name: Sonarqube uploading
       #   shell: bash
       #   run: sonar-scanner -Dcommunity.rust.clippy.reportPaths=clippy.json -Dcommunity.rust.lcov.reportPaths=lcov.info -Dsonar.host.url=${{ secrets.SONAR_URL }} -Dsonar.login=${{ secrets.SONAR_TOKEN }}
