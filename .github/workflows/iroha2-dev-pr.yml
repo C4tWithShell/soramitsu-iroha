@@ -93,6 +93,7 @@ jobs:
             -Dcommunity.rust.clippy.reportPaths=clippy.json
             -Dcommunity.rust.lcov.reportPaths=lcov.info
       - name: DefectDojo
+        if: always()
         id: defectdojo
         uses: C4tWithShell/defectdojo-action@1.0.0
         with:
@@ -106,6 +107,7 @@ jobs:
           github_repository: ${{ github.repository }}
           reports: '{"Github Vulnerability Scan": "github.json"}'
       - name: Show response
+        if: always()
         run: |
           set -e
           printf '%s\n' '${{ steps.defectdojo.outputs.response }}'
