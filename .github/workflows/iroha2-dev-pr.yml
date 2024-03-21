@@ -106,6 +106,7 @@ jobs:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           github_repository: ${{ github.repository }}
           product: ${{ github.repository }}
+          environment: Test
           reports: '{"Github Vulnerability Scan": "github.json"}'
       - name: Show response
         if: always()
