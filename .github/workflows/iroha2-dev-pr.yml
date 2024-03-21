@@ -95,7 +95,7 @@ jobs:
       - name: DefectDojo
         if: always()
         id: defectdojo
-        uses: C4tWithShell/defectdojo-action@1.0.0
+        uses: C4tWithShell/defectdojo-action@1.0.1
         with:
           token: ${{ secrets.DEFECTOJO_TOKEN }}
           defectdojo_url: ${{ secrets.DEFECTOJO_URL }}
