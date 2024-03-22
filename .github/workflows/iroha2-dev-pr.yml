@@ -47,7 +47,7 @@ jobs:
   sonar_job:
     runs-on: self-hosted #[self-hosted, Linux, iroha2ci]
     container:
-      image: hyperledger/iroha2-ci:nightly-2024-01-12
+      image: hyperledger/iroha2-ci:nightly-2024-01-12-jq
     steps:
       - uses: actions/checkout@v4
       # TODO Remove this step #2165
